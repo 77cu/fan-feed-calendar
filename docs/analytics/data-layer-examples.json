@@ -1,0 +1,173 @@
+[
+  {
+    "event": "page_view",
+    "ts": "2024-05-01T12:00:00.000Z",
+    "request_id": "7d8c2c87-3f0c-4fb1-9bf9-3b1f8049dc60",
+    "context": {
+      "env": "production",
+      "tenant_id": "8c50b8ef-9e34-4e2d-9df2-02b91de1b4d1",
+      "user_id_hash": "b1f6f04f5f1c9d5b8e6f8f5b5f5d5c4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8",
+      "ui_theme": "auto",
+      "sport": "soccer",
+      "competition_id": "premier-league",
+      "team_ids": ["arsenal", "chelsea"],
+      "plan_tier": "pro",
+      "integration_provider": "google"
+    }
+  },
+  {
+    "event": "onboarding_completed",
+    "ts": "2024-05-01T12:05:30.000Z",
+    "request_id": "4dd3a8c0-ff3f-45e4-9b8f-1f58f0c49f47",
+    "context": {
+      "env": "production",
+      "tenant_id": "8c50b8ef-9e34-4e2d-9df2-02b91de1b4d1",
+      "user_id_hash": "b1f6f04f5f1c9d5b8e6f8f5b5f5d5c4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8",
+      "ui_theme": "auto",
+      "sport": "soccer",
+      "competition_id": "premier-league",
+      "team_ids": ["arsenal", "chelsea"],
+      "plan_tier": "pro",
+      "integration_provider": "google"
+    },
+    "payload": {
+      "duration_ms": 45000,
+      "steps_completed": 5
+    }
+  },
+  {
+    "event": "integration_connected",
+    "ts": "2024-05-01T12:06:10.000Z",
+    "request_id": "4b3bfa0b-f492-4c07-9ea5-6c3c3d4977e2",
+    "context": {
+      "env": "production",
+      "tenant_id": "8c50b8ef-9e34-4e2d-9df2-02b91de1b4d1",
+      "user_id_hash": "b1f6f04f5f1c9d5b8e6f8f5b5f5d5c4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8",
+      "ui_theme": "auto",
+      "sport": "soccer",
+      "competition_id": "premier-league",
+      "team_ids": ["arsenal", "chelsea"],
+      "plan_tier": "pro",
+      "integration_provider": "google"
+    },
+    "payload": {
+      "provider": "google",
+      "duration_ms": 3200
+    }
+  },
+  {
+    "event": "calendar_push_failed",
+    "ts": "2024-05-01T12:07:00.000Z",
+    "request_id": "5e6d7c8b-9a0b-4c1d-8e2f-3a4b5c6d7e8f",
+    "context": {
+      "env": "production",
+      "tenant_id": "8c50b8ef-9e34-4e2d-9df2-02b91de1b4d1",
+      "user_id_hash": "b1f6f04f5f1c9d5b8e6f8f5b5f5d5c4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8",
+      "ui_theme": "auto",
+      "sport": "soccer",
+      "competition_id": "premier-league",
+      "team_ids": ["arsenal", "chelsea"],
+      "plan_tier": "pro",
+      "integration_provider": "google"
+    },
+    "payload": {
+      "provider": "google",
+      "fixtures": 48,
+      "error_code": "timeout"
+    }
+  },
+  {
+    "event": "view_changed",
+    "ts": "2024-05-01T12:08:15.000Z",
+    "request_id": "0a1b2c3d-4e5f-6789-abcd-ef0123456789",
+    "context": {
+      "env": "production",
+      "tenant_id": "8c50b8ef-9e34-4e2d-9df2-02b91de1b4d1",
+      "user_id_hash": "b1f6f04f5f1c9d5b8e6f8f5b5f5d5c4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8",
+      "ui_theme": "auto",
+      "sport": "soccer",
+      "competition_id": "premier-league",
+      "team_ids": ["arsenal", "chelsea"],
+      "plan_tier": "pro",
+      "integration_provider": "google"
+    },
+    "payload": {
+      "view": "week"
+    }
+  },
+  {
+    "event": "checkout_completed",
+    "ts": "2024-05-01T12:10:00.000Z",
+    "request_id": "20f5aaba-7bbf-4f7f-9664-5d4c4b3a2a1a",
+    "context": {
+      "env": "production",
+      "tenant_id": "8c50b8ef-9e34-4e2d-9df2-02b91de1b4d1",
+      "user_id_hash": "b1f6f04f5f1c9d5b8e6f8f5b5f5d5c4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8",
+      "ui_theme": "auto",
+      "sport": "soccer",
+      "competition_id": "premier-league",
+      "team_ids": ["arsenal", "chelsea"],
+      "plan_tier": "pro",
+      "integration_provider": "google"
+    },
+    "payload": {
+      "plan_tier": "pro",
+      "transaction_id": "txn_123",
+      "value": 99.0,
+      "currency": "USD"
+    },
+    "ecommerce": {
+      "items": [
+        {
+          "item_id": "pro",
+          "item_name": "Pro Plan",
+          "item_category": "subscription",
+          "price": 99.0,
+          "quantity": 1
+        }
+      ],
+      "currency": "USD",
+      "value": 99.0
+    }
+  },
+  {
+    "event": "consent_accepted",
+    "ts": "2024-05-01T12:11:20.000Z",
+    "request_id": "1f2e3d4c-5b6a-7980-9a8b-7c6d5e4f3a2b",
+    "context": {
+      "env": "production",
+      "tenant_id": "8c50b8ef-9e34-4e2d-9df2-02b91de1b4d1",
+      "user_id_hash": "b1f6f04f5f1c9d5b8e6f8f5b5f5d5c4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8",
+      "ui_theme": "auto",
+      "sport": "soccer",
+      "competition_id": "premier-league",
+      "team_ids": ["arsenal", "chelsea"],
+      "plan_tier": "pro",
+      "integration_provider": "google"
+    },
+    "payload": {
+      "categories": ["analytics", "functional"]
+    }
+  },
+  {
+    "event": "ui_error_shown",
+    "ts": "2024-05-01T12:12:45.000Z",
+    "request_id": "a3f2e30e-d39d-4c0f-8a3b-42bc68b99c1b",
+    "context": {
+      "env": "production",
+      "tenant_id": "8c50b8ef-9e34-4e2d-9df2-02b91de1b4d1",
+      "user_id_hash": "b1f6f04f5f1c9d5b8e6f8f5b5f5d5c4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8",
+      "ui_theme": "auto",
+      "sport": "soccer",
+      "competition_id": "premier-league",
+      "team_ids": ["arsenal", "chelsea"],
+      "plan_tier": "pro",
+      "integration_provider": "google"
+    },
+    "payload": {
+      "code": "integration-failed",
+      "message": "Failed to connect Google Calendar",
+      "surface": "integration-modal"
+    }
+  }
+]
