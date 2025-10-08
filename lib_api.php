@@ -70,6 +70,34 @@ function fetch_teams(string $league, string $season): array {
     return $out;
 }
 
+/** Fetch leagues for a season */
+function fetch_leagues(string $season): array {
+    $resp = api_get('/leagues', ['season' => $season]);
+    $out = [];
+    foreach ($resp['response'] ?? [] as $row) {
+        $league  = $row['league']  ?? [];
+        $country = $row['country'] ?? [];
+        $id = $league['id'] ?? null;
+        if ($id === null) {
+            continue;
+        }
+        $out[] = [
+            'id'      => (int)$id,
+            'name'    => (string)($league['name'] ?? ''),
+            'type'    => (string)($league['type'] ?? ''),
+            'country' => (string)($country['name'] ?? ''),
+        ];
+    }
+
+    usort($out, function (array $a, array $b): int {
+        $keyA = sprintf('%s %s', $a['country'], $a['name']);
+        $keyB = sprintf('%s %s', $b['country'], $b['name']);
+        return strcmp($keyA, $keyB);
+    });
+
+    return $out;
+}
+
 /** Fetch fixtures for a league/season (optionally limited to team id) */
 function fetch_fixtures(string $league, string $season, ?int $teamId, string $tz): array {
     $params = ['league'=>$league, 'season'=>$season, 'timezone'=>$tz];
