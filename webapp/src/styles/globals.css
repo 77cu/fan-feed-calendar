@@ -1,0 +1,18 @@
+@import "./tokens.css";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-family-sans);
+}
+
+.theme-dark body,
+.theme-dark {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
