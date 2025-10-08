@@ -17,7 +17,7 @@ function foldLine(string $k, string $v): string {
         $out .= substr($l, 0, 75) . "\r\n ";
         $l = substr($l, 75);
     }
-    return $out . "\r\n";
+    return $out . $l . "\r\n";
 }
 function fail(int $code, string $msg): void {
     http_response_code($code);
@@ -161,7 +161,7 @@ foreach ($filtered as $f) {
     if ($venue !== '') {
         $buf .= foldLine('LOCATION', icsEscape($venue));
     }
-    $buf .= foldLine('DESCRIPTION', $desc);
+    $buf .= foldLine('DESCRIPTION', icsEscape($desc));
     $buf .= "END:VEVENT\r\n";
 }
 
