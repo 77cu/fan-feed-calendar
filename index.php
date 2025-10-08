@@ -27,6 +27,7 @@ if (is_file($teamsFile)) {
 <meta charset="utf-8">
 <title>Fan Feed Calendar – Prototype</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Google Tag Manager placeholder: insert GTM container script here when available. -->
 <style>
 body{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;max-width:720px;margin:40px auto;padding:0 16px;line-height:1.45}
 h1{margin:0 0 8px} .card{border:1px solid #ddd;border-radius:12px;padding:16px;margin:16px 0}
@@ -37,6 +38,89 @@ label{display:block;margin:10px 0 6px} select,input[type=email],input[type=numbe
 .warn{background:#fff7e6;border:1px solid #ffd591}
 .note{background:#eef7ff;border:1px solid #b8defc}
 </style>
+<script>
+(function (w) {
+  w.dataLayer = w.dataLayer || [];
+
+  var requestId = (function generateRequestId() {
+    if (w.crypto && typeof w.crypto.randomUUID === 'function') {
+      try { return w.crypto.randomUUID(); } catch (e) {}
+    }
+    var random = Math.random().toString(36).slice(2);
+    return 'req-' + random + '-' + Date.now().toString(36);
+  })();
+
+  w.ffRequestId = requestId;
+
+  function ffPush(eventName, payload) {
+    var base = {
+      event: eventName,
+      ts: new Date().toISOString(),
+      request_id: requestId
+    };
+
+    if (payload && typeof payload === 'object') {
+      for (var key in payload) {
+        if (Object.prototype.hasOwnProperty.call(payload, key)) {
+          base[key] = payload[key];
+        }
+      }
+    }
+
+    w.dataLayer.push(base);
+    return base;
+  }
+
+  w.ffPush = ffPush;
+
+  ffPush('page_view', {
+    page_name: 'fan_feed_calendar',
+    page_type: 'calendar',
+    page_path: w.location.pathname + w.location.search,
+    tenant_id: null,
+    league: <?= json_encode($league) ?>,
+    season: <?= json_encode($season) ?>,
+    locale: (w.document.documentElement && w.document.documentElement.lang) || 'en',
+    theme: (w.matchMedia && w.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'
+  });
+
+  w.addEventListener('DOMContentLoaded', function () {
+    var fetchLink = w.document.querySelector('[data-ff-fetch]');
+    if (fetchLink) {
+      fetchLink.addEventListener('click', function () {
+        ffPush('calendar_fetch_requested', {
+          league: <?= json_encode($league) ?>,
+          season: <?= json_encode($season) ?>
+        });
+      });
+    }
+
+    var icsForm = w.document.querySelector('[data-ff-ics-form]');
+    if (icsForm) {
+      icsForm.addEventListener('submit', function () {
+        var teamSelect = icsForm.querySelector('#team');
+        var countInput = icsForm.querySelector('#count');
+        var allInput = icsForm.querySelector('#all');
+
+        var teamIdRaw = teamSelect ? teamSelect.value : '';
+        var teamId = teamIdRaw ? parseInt(teamIdRaw, 10) : null;
+        var allChecked = !!(allInput && allInput.checked);
+        var countValue = null;
+        if (!allChecked && countInput) {
+          var parsedCount = parseInt(countInput.value, 10);
+          countValue = isNaN(parsedCount) ? null : parsedCount;
+        }
+
+        ffPush('ics_downloaded', {
+          team_ids: teamId !== null && !isNaN(teamId) ? [teamId] : [],
+          count: countValue,
+          all: allChecked
+        });
+      });
+    }
+  });
+})(window);
+</script>
 </head>
 <body>
 <h1>Fan Feed Calendar</h1>
@@ -60,7 +144,7 @@ label{display:block;margin:10px 0 6px} select,input[type=email],input[type=numbe
 
   <p>After selecting the season, populate teams and fixtures for that season:</p>
   <p>
-    <a class="btn" href="admin_fetch.php?league=<?= urlencode($league) ?>&season=<?= urlencode($season) ?>">
+    <a class="btn" data-ff-fetch href="admin_fetch.php?league=<?= urlencode($league) ?>&season=<?= urlencode($season) ?>">
       Fetch teams & fixtures (<?= htmlspecialchars($season) ?>)
     </a>
   </p>
@@ -73,7 +157,7 @@ label{display:block;margin:10px 0 6px} select,input[type=email],input[type=numbe
 
 <div class="card">
   <h3>Step 2: Generate your calendar file</h3>
-  <form method="post" action="make_ics.php">
+  <form method="post" action="make_ics.php" data-ff-ics-form>
     <input type="hidden" name="season" value="<?= htmlspecialchars($season) ?>">
     <input type="hidden" name="league" value="<?= htmlspecialchars($league) ?>">
 
