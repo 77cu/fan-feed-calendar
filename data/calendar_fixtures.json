@@ -1,0 +1,133 @@
+{
+  "month": "2023-08",
+  "fixtures": [
+    {
+      "id": 1035037,
+      "kickoff": "2023-08-11T20:00:00+01:00",
+      "status": "Final",
+      "status_code": "FT",
+      "home": "Burnley",
+      "away": "Manchester City",
+      "venue": "Turf Moor, Burnley",
+      "league": {
+        "name": "Premier League",
+        "badge": "PL"
+      },
+      "round": "Regular Season - 1",
+      "notes": "Opening night under the lights.",
+      "odds": {
+        "home": "11/2",
+        "draw": "4/1",
+        "away": "1/3",
+        "updated": "2023-08-10T18:15:00Z"
+      }
+    },
+    {
+      "id": 1035038,
+      "kickoff": "2023-08-12T12:30:00+01:00",
+      "status": "Scheduled",
+      "status_code": "NS",
+      "home": "Arsenal",
+      "away": "Nottingham Forest",
+      "venue": "Emirates Stadium, London",
+      "league": {
+        "name": "Premier League",
+        "badge": "PL"
+      },
+      "round": "Regular Season - 1",
+      "notes": "Early kick-off at the Emirates.",
+      "odds": {
+        "home": "2/7",
+        "draw": "4/1",
+        "away": "17/2",
+        "updated": "2023-08-11T09:00:00Z"
+      }
+    },
+    {
+      "id": 1035039,
+      "kickoff": "2023-08-12T15:00:00+01:00",
+      "status": "Scheduled",
+      "status_code": "NS",
+      "home": "Bournemouth",
+      "away": "West Ham",
+      "venue": "Vitality Stadium, Bournemouth",
+      "league": {
+        "name": "Premier League",
+        "badge": "PL"
+      },
+      "round": "Regular Season - 1",
+      "notes": "Seaside clash on the south coast.",
+      "odds": {
+        "home": "9/5",
+        "draw": "5/2",
+        "away": "7/5",
+        "updated": "2023-08-11T09:05:00Z"
+      }
+    },
+    {
+      "id": 1035043,
+      "kickoff": "2023-08-12T17:30:00+01:00",
+      "status": "Scheduled",
+      "status_code": "NS",
+      "home": "Newcastle",
+      "away": "Aston Villa",
+      "venue": "St. James' Park, Newcastle upon Tyne",
+      "league": {
+        "name": "Premier League",
+        "badge": "PL"
+      },
+      "round": "Regular Season - 1",
+      "notes": "Evening kick-off on Tyneside.",
+      "odds": {
+        "home": "21/20",
+        "draw": "13/5",
+        "away": "12/5",
+        "updated": "2023-08-11T09:10:00Z"
+      }
+    },
+    {
+      "id": 1035048,
+      "kickoff": "2023-08-14T20:00:00+01:00",
+      "status": "Postponed",
+      "status_code": "PST",
+      "home": "Manchester United",
+      "away": "Wolves",
+      "venue": "Old Trafford, Manchester",
+      "league": {
+        "name": "Premier League",
+        "badge": "PL"
+      },
+      "round": "Regular Season - 1",
+      "notes": "Fixture postponed due to local event planning.",
+      "odds": {
+        "home": "8/15",
+        "draw": "16/5",
+        "away": "11/2",
+        "updated": "2023-08-10T17:45:00Z"
+      }
+    }
+  ],
+  "changes": [
+    {
+      "type": "time_shift",
+      "fixture_id": 1035037,
+      "headline": "Kick-off moved 15 minutes later",
+      "details": "Burnley vs Manchester City now starts at 20:00 (was 19:45).",
+      "published": "2023-07-28T11:00:00Z"
+    },
+    {
+      "type": "status",
+      "fixture_id": 1035048,
+      "headline": "Match postponed",
+      "details": "Manchester United vs Wolves postponed, new date TBC.",
+      "published": "2023-08-07T08:30:00Z"
+    },
+    {
+      "type": "venue",
+      "fixture_id": 1035039,
+      "headline": "Minor seating restriction",
+      "details": "Bournemouth advise early arrival due to stand refurbishments.",
+      "published": "2023-08-05T12:00:00Z"
+    }
+  ]
+}

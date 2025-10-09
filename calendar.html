@@ -1,0 +1,1098 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Fan Feed Calendar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f5f7fb;
+      --fg: #111827;
+      --surface: #ffffff;
+      --surface-subtle: #f0f2f8;
+      --border: rgba(15, 23, 42, 0.12);
+      --accent: #2563eb;
+      --accent-strong: #1d4ed8;
+      --muted: #6b7280;
+      --badge-bg: linear-gradient(135deg, #3b82f6, #2563eb);
+      --badge-fg: #ffffff;
+      --shadow: 0 14px 34px rgba(15, 23, 42, 0.12);
+      --shadow-soft: 0 4px 14px rgba(15, 23, 42, 0.08);
+      --radius-lg: 20px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      font-size: 16px;
+      background-color: var(--bg);
+      color: var(--fg);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0b1120;
+        --fg: #e5e7eb;
+        --surface: #111827;
+        --surface-subtle: #16213a;
+        --border: rgba(148, 163, 184, 0.24);
+        --accent: #60a5fa;
+        --accent-strong: #93c5fd;
+        --muted: #94a3b8;
+        --badge-bg: linear-gradient(135deg, #60a5fa, #2563eb);
+        --badge-fg: #f8fafc;
+        --shadow: 0 16px 36px rgba(15, 23, 42, 0.4);
+        --shadow-soft: 0 6px 24px rgba(15, 23, 42, 0.5);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", "SF Pro Display", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-shell {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: clamp(16px, 4vw, 32px);
+      gap: clamp(16px, 3vw, 24px);
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.75rem, 2.8vw, 2.4rem);
+      letter-spacing: -0.02em;
+    }
+
+    .brand span {
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    .view-toggle {
+      display: inline-flex;
+      border-radius: 999px;
+      background: var(--surface);
+      box-shadow: var(--shadow-soft);
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .view-toggle button {
+      min-width: 110px;
+      padding: 12px 18px;
+      border-radius: 999px;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+      font-size: 0.95rem;
+      min-height: 44px;
+    }
+
+    .view-toggle button.is-active {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .main-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) clamp(260px, 24vw, 340px);
+      gap: clamp(20px, 4vw, 32px);
+    }
+
+    .calendar-surface {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      padding: clamp(16px, 3vw, 28px);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(16px, 2vw, 24px);
+    }
+
+    .changes-panel {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      padding: clamp(16px, 3vw, 24px);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: calc(100vh - 120px);
+      position: sticky;
+      top: clamp(16px, 4vw, 32px);
+    }
+
+    #changes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .changes-panel h2 {
+      margin: 0;
+      font-size: 1.15rem;
+    }
+
+    .change-item {
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .change-item strong {
+      font-size: 0.95rem;
+    }
+
+    .change-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .fixture-list {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .date-group {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .date-group h3 {
+      margin: 0;
+      font-size: 1.15rem;
+      letter-spacing: -0.01em;
+    }
+
+    .fixture-card {
+      display: grid;
+      grid-template-columns: auto 1fr auto auto;
+      gap: 16px;
+      align-items: center;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--surface-subtle);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .fixture-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .fixture-card.is-excluded {
+      opacity: 0.6;
+      border-style: dashed;
+    }
+
+    .fixture-card button {
+      background: none;
+      border: none;
+    }
+
+    .fixture-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .fixture-teams {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .fixture-info {
+      font-size: 0.85rem;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--badge-bg);
+      color: var(--badge-fg);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .time-status {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      min-width: 120px;
+    }
+
+    .time-status span:first-child {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .status {
+      font-size: 0.8rem;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.12);
+      color: var(--accent);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .status[data-code="PST"] {
+      background: rgba(248, 113, 113, 0.18);
+      color: #f87171;
+    }
+
+    .status[data-code="FT"] {
+      background: rgba(34, 197, 94, 0.18);
+      color: #22c55e;
+    }
+
+    .include-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 18px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease, border 0.2s ease;
+      min-width: 140px;
+      min-height: 44px;
+    }
+
+    .include-toggle.included {
+      background: rgba(37, 99, 235, 0.12);
+      border-color: rgba(37, 99, 235, 0.3);
+      color: var(--accent);
+    }
+
+    .include-toggle.excluded {
+      background: rgba(148, 163, 184, 0.14);
+      color: var(--muted);
+    }
+
+    .month-view {
+      display: grid;
+      gap: 8px;
+    }
+
+    .month-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .weekday {
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .day-cell {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .day-cell.is-today {
+      border-color: var(--accent);
+    }
+
+    .day-cell header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .event-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 6px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.16);
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 600;
+      max-width: 100%;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      cursor: pointer;
+      min-height: 44px;
+    }
+
+    .event-pill[data-status="PST"] {
+      background: rgba(248, 113, 113, 0.18);
+      color: #f87171;
+    }
+
+    .event-pill[data-status="FT"] {
+      background: rgba(34, 197, 94, 0.2);
+      color: #22c55e;
+    }
+
+    .event-pill.is-excluded {
+      opacity: 0.55;
+      text-decoration: line-through;
+    }
+
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.52);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 20;
+    }
+
+    .drawer-backdrop.is-open {
+      display: flex;
+    }
+
+    .drawer {
+      width: min(640px, 100%);
+      background: var(--surface);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      box-shadow: 0 -20px 40px rgba(15, 23, 42, 0.35);
+      padding: clamp(20px, 5vw, 32px);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-height: calc(100vh - 60px);
+      overflow-y: auto;
+    }
+
+    .drawer header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .drawer h2 {
+      margin: 0;
+      font-size: 1.35rem;
+      letter-spacing: -0.01em;
+    }
+
+    .drawer-close {
+      border: none;
+      background: rgba(148, 163, 184, 0.16);
+      color: var(--muted);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 1.2rem;
+    }
+
+    .drawer-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+    }
+
+    .drawer-section h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .key-value {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 0.9rem;
+    }
+
+    .key-value div {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .odds-block {
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--surface-subtle);
+      padding: 8px 16px 16px;
+    }
+
+    .odds-block summary {
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 12px 0;
+      list-style: none;
+    }
+
+    .odds-block summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .odds-block summary span {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .odds-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .odds-item {
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      background: rgba(37, 99, 235, 0.12);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.85rem;
+    }
+
+    .odds-item span:first-child {
+      font-weight: 600;
+    }
+
+    .empty-state {
+      padding: 20px;
+      text-align: center;
+      border-radius: var(--radius-md);
+      background: var(--surface-subtle);
+      color: var(--muted);
+    }
+
+    @media (max-width: 1024px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+      .changes-panel {
+        position: static;
+        order: -1;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .changes-panel::before {
+        content: "Changes";
+        font-weight: 700;
+        font-size: 1rem;
+      }
+      .changes-panel h2 {
+        display: none;
+      }
+      #changes-list {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+      .change-item {
+        min-width: 240px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        align-items: flex-start;
+      }
+      .view-toggle {
+        width: 100%;
+      }
+      .view-toggle button {
+        flex: 1;
+      }
+      .fixture-card {
+        grid-template-columns: 1fr;
+        justify-items: flex-start;
+      }
+      .badge {
+        order: -2;
+      }
+      .time-status {
+        align-items: flex-start;
+      }
+      .include-toggle {
+        width: 100%;
+        justify-content: center;
+      }
+      .day-cell {
+        min-height: 100px;
+      }
+      .drawer {
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header>
+      <div class="brand">
+        <h1>Fan Feed</h1>
+        <span>Fixture Calendar</span>
+      </div>
+      <div class="view-toggle" role="tablist" aria-label="Calendar views">
+        <button type="button" data-view-option="list" aria-selected="true" role="tab" class="is-active">List</button>
+        <button type="button" data-view-option="month" aria-selected="false" role="tab">Month</button>
+      </div>
+    </header>
+
+    <div class="main-layout">
+      <section class="calendar-surface" aria-live="polite">
+        <div id="list-view" class="fixture-list" data-view="list" aria-label="Upcoming fixtures"></div>
+        <div id="month-view" class="month-view" data-view="month" hidden>
+          <div class="month-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <h2 id="month-title" style="margin:0;font-size:1.2rem;letter-spacing:-0.01em;"></h2>
+            <div style="font-size:0.9rem;color:var(--muted);">Tap any match to view details</div>
+          </div>
+          <div class="month-grid" role="grid" aria-readonly="true"></div>
+        </div>
+      </section>
+
+      <aside class="changes-panel" aria-label="Recent fixture changes">
+        <h2>Recent changes</h2>
+        <div id="changes-list"></div>
+      </aside>
+    </div>
+  </div>
+
+  <template id="weekday-template">
+    <div class="weekday" role="columnheader"></div>
+  </template>
+
+  <div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true">
+    <article class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+      <header>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <h2 id="drawer-title">Fixture</h2>
+          <div id="drawer-subtitle" style="font-size:0.9rem;color:var(--muted);"></div>
+        </div>
+        <button type="button" class="drawer-close" id="drawer-close" aria-label="Close details">×</button>
+      </header>
+      <section class="drawer-section">
+        <h3>Summary</h3>
+        <p id="drawer-summary" style="margin:0;font-size:0.95rem;"></p>
+      </section>
+      <section class="drawer-section">
+        <h3>Match details</h3>
+        <div class="key-value" id="drawer-details"></div>
+      </section>
+      <details class="odds-block" id="odds-block">
+        <summary>
+          Latest odds
+          <span id="odds-updated">Updated moments ago</span>
+        </summary>
+        <div class="odds-grid">
+          <div class="odds-item">
+            <span>Home</span>
+            <span id="odds-home">--</span>
+          </div>
+          <div class="odds-item">
+            <span>Draw</span>
+            <span id="odds-draw">--</span>
+          </div>
+          <div class="odds-item">
+            <span>Away</span>
+            <span id="odds-away">--</span>
+          </div>
+        </div>
+      </details>
+    </article>
+  </div>
+
+  <script>
+    const listContainer = document.getElementById('list-view');
+    const monthContainer = document.getElementById('month-view');
+    const monthGrid = monthContainer.querySelector('.month-grid');
+    const monthTitle = document.getElementById('month-title');
+    const changesList = document.getElementById('changes-list');
+    const viewButtons = document.querySelectorAll('[data-view-option]');
+    const weekdayTemplate = document.getElementById('weekday-template');
+    const drawerBackdrop = document.getElementById('drawer-backdrop');
+    const drawerTitle = document.getElementById('drawer-title');
+    const drawerSubtitle = document.getElementById('drawer-subtitle');
+    const drawerSummary = document.getElementById('drawer-summary');
+    const drawerDetails = document.getElementById('drawer-details');
+    const oddsBlock = document.getElementById('odds-block');
+    const oddsUpdated = document.getElementById('odds-updated');
+    const oddsHome = document.getElementById('odds-home');
+    const oddsDraw = document.getElementById('odds-draw');
+    const oddsAway = document.getElementById('odds-away');
+    const drawerClose = document.getElementById('drawer-close');
+
+    const state = {
+      fixtures: [],
+      groupedFixtures: new Map(),
+      includeState: new Map(),
+      changes: [],
+      month: null
+    };
+
+    const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    function formatDate(date) {
+      return new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'long', day: 'numeric' }).format(date);
+    }
+
+    function formatTime(date) {
+      return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(date);
+    }
+
+    function formatDateTime(date) {
+      return new Intl.DateTimeFormat(undefined, {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit'
+      }).format(date);
+    }
+
+    function formatRelative(date) {
+      const now = new Date();
+      const diffMs = date.getTime() - now.getTime();
+      const absMs = Math.abs(diffMs);
+      const diffMins = Math.round(absMs / 60000);
+      const diffHours = Math.round(diffMins / 60);
+      const isFuture = diffMs > 0;
+      if (diffMins < 60) {
+        return isFuture
+          ? `in ${diffMins} min${diffMins === 1 ? '' : 's'}`
+          : `${diffMins} min${diffMins === 1 ? '' : 's'} ago`;
+      }
+      if (diffHours < 48) {
+        return isFuture
+          ? `in ${diffHours} hr${diffHours === 1 ? '' : 's'}`
+          : `${diffHours} hr${diffHours === 1 ? '' : 's'} ago`;
+      }
+      return date.toLocaleDateString();
+    }
+
+    function toLocalDateKey(date) {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    }
+
+    function renderView(view) {
+      if (view === 'list') {
+        listContainer.hidden = false;
+        monthContainer.hidden = true;
+      } else {
+        listContainer.hidden = true;
+        monthContainer.hidden = false;
+      }
+      viewButtons.forEach(btn => {
+        const isActive = btn.dataset.viewOption === view;
+        btn.classList.toggle('is-active', isActive);
+        btn.setAttribute('aria-selected', String(isActive));
+      });
+    }
+
+    function groupFixtures() {
+      state.groupedFixtures.clear();
+      state.fixtures.forEach(fixture => {
+        const date = new Date(fixture.kickoff);
+        const key = toLocalDateKey(date);
+        if (!state.groupedFixtures.has(key)) {
+          state.groupedFixtures.set(key, []);
+        }
+        state.groupedFixtures.get(key).push(fixture);
+      });
+      state.groupedFixtures.forEach(list => {
+        list.sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff));
+      });
+    }
+
+    function renderList() {
+      listContainer.innerHTML = '';
+      if (!state.groupedFixtures.size) {
+        listContainer.append(createEmptyState('No fixtures available.'));
+        return;
+      }
+      const entries = Array.from(state.groupedFixtures.entries()).sort((a, b) => new Date(a[0]) - new Date(b[0]));
+      entries.forEach(([dateKey, fixtures]) => {
+        const wrapper = document.createElement('section');
+        wrapper.className = 'date-group';
+        const heading = document.createElement('h3');
+        heading.textContent = formatDate(new Date(`${dateKey}T00:00:00`));
+        wrapper.appendChild(heading);
+        fixtures.forEach(fixture => {
+          wrapper.appendChild(createFixtureCard(fixture));
+        });
+        listContainer.appendChild(wrapper);
+      });
+    }
+
+    function createFixtureCard(fixture) {
+      const card = document.createElement('article');
+      card.className = 'fixture-card';
+      card.dataset.fixtureId = String(fixture.id);
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('role', 'button');
+      card.addEventListener('click', () => openDrawer(fixture));
+      card.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openDrawer(fixture);
+        }
+      });
+
+      const badge = document.createElement('div');
+      badge.className = 'badge';
+      badge.textContent = fixture.league?.badge ?? 'LG';
+
+      const meta = document.createElement('div');
+      meta.className = 'fixture-meta';
+
+      const teams = document.createElement('div');
+      teams.className = 'fixture-teams';
+      teams.textContent = `${fixture.home} vs ${fixture.away}`;
+
+      const info = document.createElement('div');
+      info.className = 'fixture-info';
+      info.innerHTML = `
+        <span>${fixture.venue}</span>
+        <span>· ${fixture.league?.name ?? 'League'}</span>
+      `;
+
+      meta.appendChild(teams);
+      meta.appendChild(info);
+
+      const statusColumn = document.createElement('div');
+      statusColumn.className = 'time-status';
+      const time = document.createElement('span');
+      time.textContent = formatTime(new Date(fixture.kickoff));
+      const status = document.createElement('span');
+      status.className = 'status';
+      status.dataset.code = fixture.status_code;
+      status.textContent = fixture.status;
+      statusColumn.appendChild(time);
+      statusColumn.appendChild(status);
+
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'include-toggle included';
+      toggle.dataset.fixtureId = String(fixture.id);
+      toggle.setAttribute('aria-pressed', 'true');
+      toggle.setAttribute('aria-label', 'Toggle fixture inclusion');
+      toggle.innerHTML = '<span aria-hidden="true">✓</span><span>Included</span>';
+      toggle.addEventListener('click', (event) => {
+        event.stopPropagation();
+        toggleFixture(fixture, toggle);
+      });
+
+      card.appendChild(badge);
+      card.appendChild(meta);
+      card.appendChild(statusColumn);
+      card.appendChild(toggle);
+
+      const included = state.includeState.get(fixture.id) ?? true;
+      card.classList.toggle('is-excluded', !included);
+      if (!included) {
+        toggle.classList.remove('included');
+        toggle.classList.add('excluded');
+        toggle.setAttribute('aria-pressed', 'false');
+        toggle.innerHTML = '<span aria-hidden="true">✕</span><span>Excluded</span>';
+      }
+
+      return card;
+    }
+
+    function createEmptyState(message) {
+      const empty = document.createElement('div');
+      empty.className = 'empty-state';
+      empty.textContent = message;
+      return empty;
+    }
+
+    function renderMonth() {
+      monthGrid.innerHTML = '';
+      if (weekdayTemplate) {
+        WEEKDAYS.forEach(day => {
+          const el = weekdayTemplate.content.firstElementChild.cloneNode(true);
+          el.textContent = day;
+          monthGrid.appendChild(el);
+        });
+      }
+
+      if (!state.month) {
+        monthTitle.textContent = '';
+        return;
+      }
+
+      const [year, month] = state.month.split('-').map(Number);
+      const firstDay = new Date(year, month - 1, 1);
+      const startDay = firstDay.getDay();
+      const daysInMonth = new Date(year, month, 0).getDate();
+      const todayKey = toLocalDateKey(new Date());
+
+      for (let i = 0; i < startDay; i++) {
+        const filler = document.createElement('div');
+        filler.className = 'day-cell';
+        filler.setAttribute('aria-hidden', 'true');
+        filler.style.visibility = 'hidden';
+        monthGrid.appendChild(filler);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cellDate = new Date(year, month - 1, day);
+        const key = toLocalDateKey(cellDate);
+        const cell = document.createElement('div');
+        cell.className = 'day-cell';
+        if (key === todayKey) {
+          cell.classList.add('is-today');
+        }
+        const header = document.createElement('header');
+        const label = document.createElement('span');
+        label.textContent = day;
+        header.appendChild(label);
+        cell.appendChild(header);
+        const fixtures = state.groupedFixtures.get(key) ?? [];
+        fixtures.forEach(fixture => {
+          const pill = document.createElement('button');
+          pill.type = 'button';
+          pill.className = 'event-pill';
+          pill.dataset.fixtureId = String(fixture.id);
+          pill.dataset.status = fixture.status_code;
+          pill.textContent = `${formatTime(new Date(fixture.kickoff))} · ${fixture.home} vs ${fixture.away}`;
+          pill.title = `${fixture.home} vs ${fixture.away}`;
+          pill.addEventListener('click', () => openDrawer(fixture));
+          const included = state.includeState.get(fixture.id) ?? true;
+          if (!included) {
+            pill.classList.add('is-excluded');
+          }
+          cell.appendChild(pill);
+        });
+        if (!fixtures.length) {
+          const placeholder = document.createElement('span');
+          placeholder.style.color = 'var(--muted)';
+          placeholder.style.fontSize = '0.75rem';
+          placeholder.textContent = 'No fixtures';
+          cell.appendChild(placeholder);
+        }
+        monthGrid.appendChild(cell);
+      }
+
+      monthTitle.textContent = firstDay.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+    }
+
+    function renderChanges() {
+      changesList.innerHTML = '';
+      if (!state.changes.length) {
+        changesList.appendChild(createEmptyState('No recent updates.'));
+        return;
+      }
+      state.changes
+        .sort((a, b) => new Date(b.published) - new Date(a.published))
+        .forEach(change => {
+          const item = document.createElement('article');
+          item.className = 'change-item';
+          const title = document.createElement('strong');
+          title.textContent = change.headline;
+          const details = document.createElement('p');
+          details.style.margin = '0';
+          details.style.fontSize = '0.85rem';
+          details.textContent = change.details;
+          const meta = document.createElement('div');
+          meta.className = 'change-meta';
+          meta.innerHTML = `<span>${change.type.replace('_', ' ')}</span><span>•</span><span>${formatRelative(new Date(change.published))}</span>`;
+          item.appendChild(title);
+          item.appendChild(details);
+          item.appendChild(meta);
+          changesList.appendChild(item);
+        });
+    }
+
+    function toggleFixture(fixture, button) {
+      const current = state.includeState.get(fixture.id) ?? true;
+      const next = !current;
+      state.includeState.set(fixture.id, next);
+      button.setAttribute('aria-pressed', String(next));
+      updateInclusionStyles(fixture.id, next);
+      if (next) {
+        button.classList.remove('excluded');
+        button.classList.add('included');
+        button.innerHTML = '<span aria-hidden="true">✓</span><span>Included</span>';
+        window.dispatchEvent(new CustomEvent('fixture_included', { detail: { fixtureId: fixture.id, fixture } }));
+      } else {
+        button.classList.remove('included');
+        button.classList.add('excluded');
+        button.innerHTML = '<span aria-hidden="true">✕</span><span>Excluded</span>';
+        window.dispatchEvent(new CustomEvent('fixture_excluded', { detail: { fixtureId: fixture.id, fixture } }));
+      }
+    }
+
+    function updateInclusionStyles(fixtureId, included) {
+      document.querySelectorAll(`.fixture-card[data-fixture-id="${fixtureId}"]`).forEach(card => {
+        card.classList.toggle('is-excluded', !included);
+      });
+      document.querySelectorAll(`.event-pill[data-fixture-id="${fixtureId}"]`).forEach(pill => {
+        pill.classList.toggle('is-excluded', !included);
+      });
+    }
+
+    function openDrawer(fixture) {
+      drawerTitle.textContent = `${fixture.home} vs ${fixture.away}`;
+      drawerSubtitle.textContent = `${formatDateTime(new Date(fixture.kickoff))} · ${fixture.venue}`;
+      drawerSummary.textContent = fixture.notes ?? 'Match details coming soon.';
+      drawerDetails.innerHTML = '';
+      const details = [
+        ['League', fixture.league?.name ?? '—'],
+        ['Round', fixture.round ?? '—'],
+        ['Status', fixture.status ?? '—'],
+        ['Kick-off', formatDateTime(new Date(fixture.kickoff))]
+      ];
+      details.forEach(([key, value]) => {
+        const row = document.createElement('div');
+        const label = document.createElement('span');
+        label.style.fontWeight = '600';
+        label.textContent = key;
+        const val = document.createElement('span');
+        val.style.color = 'var(--muted)';
+        val.textContent = value;
+        row.appendChild(label);
+        row.appendChild(val);
+        drawerDetails.appendChild(row);
+      });
+
+      const updated = fixture.odds?.updated ? new Date(fixture.odds.updated) : null;
+      if (updated) {
+        oddsUpdated.textContent = `Updated ${formatRelative(updated)}`;
+      } else {
+        oddsUpdated.textContent = 'Update timing unavailable';
+      }
+      oddsHome.textContent = fixture.odds?.home ?? '—';
+      oddsDraw.textContent = fixture.odds?.draw ?? '—';
+      oddsAway.textContent = fixture.odds?.away ?? '—';
+
+      oddsBlock.open = false;
+      drawerBackdrop.classList.add('is-open');
+      drawerBackdrop.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeDrawer() {
+      drawerBackdrop.classList.remove('is-open');
+      drawerBackdrop.setAttribute('aria-hidden', 'true');
+    }
+
+    drawerBackdrop.addEventListener('click', (event) => {
+      if (event.target === drawerBackdrop) {
+        closeDrawer();
+      }
+    });
+
+    drawerClose.addEventListener('click', closeDrawer);
+
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeDrawer();
+      }
+    });
+
+    viewButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        renderView(button.dataset.viewOption);
+      });
+    });
+
+    fetch('data/calendar_fixtures.json')
+      .then(response => response.json())
+      .then(data => {
+        state.fixtures = data.fixtures ?? [];
+        state.month = data.month ?? null;
+        state.changes = data.changes ?? [];
+        state.fixtures.forEach(fixture => {
+          state.includeState.set(fixture.id, true);
+        });
+        groupFixtures();
+        renderList();
+        renderMonth();
+        renderChanges();
+      })
+      .catch(() => {
+        listContainer.innerHTML = '';
+        listContainer.appendChild(createEmptyState('Unable to load fixtures.'));
+      });
+  </script>
+</body>
+</html>
